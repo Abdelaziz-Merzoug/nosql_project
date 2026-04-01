@@ -1,0 +1,107 @@
+# =============================================================================
+# docker-compose.yml
+# Projet : Systeme de Suivi IoT Temps Reel avec Apache Cassandra
+# Module : NoSQL pour le Big Data | Dr. B. BENCHARIF | USDB Blida 1
+# Description : Infrastructure complète Cassandra + FastAPI + Streamlit
+# =============================================================================
+
+version: "3.8"
+
+services:
+
+  # ---------------------------------------------------------------------------
+  # Service 1 : Base de donnees Apache Cassandra 4.1 (LTS)
+  # Role : Stocker les donnees GPS en temps reel (tracking, alertes, stats)
+  # ---------------------------------------------------------------------------
+  cassandra:
+    image: cassandra:4.1
+    container_name: cassandra_iot
+    restart: unless-stopped
+
+    ports:
+      - "9042:9042"   # Port natif CQL (protocole binaire cassandra-driver)
+      - "7000:7000"   # Port inter-noeuds (gossip protocol)
+
+    environment:
+      CASSANDRA_CLUSTER_NAME: "IoTLogisticsCluster"
+      CASSANDRA_DC: "datacenter1"
+      CASSANDRA_RACK: "rack1"
+      MAX_HEAP_SIZE: "512M"
+      HEAP_NEWSIZE: "128M"
+
+    healthcheck:
+      test: ["CMD-SHELL", "cqlsh -e 'DESCRIBE KEYSPACES;' || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+
+    volumes:
+      - cassandra_data:/var/lib/cassandra
+      - ./db:/db:ro
+
+    networks:
+      - iot_network
+
+  # ---------------------------------------------------------------------------
+  # Service 2 : Backend FastAPI
+  # ---------------------------------------------------------------------------
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: api_iot
+    restart: unless-stopped
+
+    ports:
+      - "8000:8000"
+
+    environment:
+      CASSANDRA_HOST: "cassandra"
+
+    depends_on:
+      cassandra:
+        condition: service_healthy
+
+    networks:
+      - iot_network
+
+    volumes:
+      - ./backend:/backend:ro
+
+    command: uvicorn backend.app:app --host 0.0.0.0 --port 8000 --reload
+
+  # ---------------------------------------------------------------------------
+  # Service 3 : Dashboard Streamlit
+  # ---------------------------------------------------------------------------
+  streamlit:
+    build:
+      context: .
+      dockerfile: Dockerfile.streamlit
+    container_name: streamlit_iot
+    restart: unless-stopped
+
+    ports:
+      - "8501:8501"
+
+    environment:
+      API_URL: "http://api:8000"
+
+    depends_on:
+      - api
+
+    networks:
+      - iot_network
+
+    volumes:
+      - ./streamlit_app.py:/app/streamlit_app.py:ro
+
+    command: streamlit run /app/streamlit_app.py --server.port 8501 --server.address 0.0.0.0
+
+volumes:
+  cassandra_data:
+    driver: local
+
+networks:
+  iot_network:
+    driver: bridge

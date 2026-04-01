@@ -1,0 +1,42 @@
+# =============================================================================
+# requirements.txt
+# Projet : Systeme de Suivi IoT Temps Reel avec Apache Cassandra
+# Module : NoSQL pour le Big Data | Dr. B. BENCHARIF | USDB Blida 1
+# Versions figees pour garantir la reproductibilite de l'environnement
+# =============================================================================
+
+# Pilote officiel DataStax pour Apache Cassandra (protocole natif CQL)
+cassandra-driver==3.29.1
+
+# Framework API REST haute performance (ASGI)
+fastapi==0.111.0
+
+# Serveur ASGI avec extras (websockets, http-tools) pour les performances
+uvicorn[standard]==0.29.0
+
+# Dashboard interactif pour le frontend de monitoring
+streamlit==1.35.0
+
+# Generateur de donnees realistes pour la simulation GPS
+faker==25.2.0
+
+# Manipulation et analyse des donnees tabulaires
+pandas==2.2.2
+
+# Cartographie interactive (polylignes de trajets)
+folium==0.16.0
+
+# Integration de cartes Folium dans Streamlit
+streamlit-folium==0.20.0
+
+# Visualisation 3D et cartographie avancee dans Streamlit
+pydeck==0.9.1
+
+# Utilitaire de parsing de dates et timestamps
+python-dateutil==2.9.0
+
+# Client HTTP asynchrone pour les appels API depuis Streamlit
+httpx==0.27.0
+
+# Event loop pour Python 3.12+ (remplace asyncore supprime)
+gevent==23.9.1
