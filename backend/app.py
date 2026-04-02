@@ -42,11 +42,7 @@ if "asyncore" not in sys.modules:
 if "asynchat" not in sys.modules:
     sys.modules["asynchat"] = types.ModuleType("asynchat")
 
-from gevent import monkey
-monkey.patch_all()
-
 from cassandra.cluster import Cluster
-from cassandra.io.geventreactor import GeventConnection
 from cassandra.policies import RoundRobinPolicy, RetryPolicy
 from cassandra.query import ConsistencyLevel
 
@@ -76,12 +72,11 @@ def get_session():
     Appelee une seule fois grace a lru_cache.
     """
     cluster = Cluster(
-        contact_points=[CASSANDRA_HOST],
-        load_balancing_policy=RoundRobinPolicy(),
-        default_retry_policy=RetryPolicy(),
-        connection_class=GeventConnection,
-        connect_timeout=30,
-    )
+    contact_points=[CASSANDRA_HOST],
+    load_balancing_policy=RoundRobinPolicy(),
+    default_retry_policy=RetryPolicy(),
+    connect_timeout=30,
+)
     session = cluster.connect(KEYSPACE)
     session.default_consistency_level = ConsistencyLevel.ONE
     return session

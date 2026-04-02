@@ -6,13 +6,12 @@ FROM python:3.10-slim
 
 WORKDIR /
 
-# Copier et installer les dependances
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copier le code du backend
-COPY backend/ ./backend/
+# app.py est dans backend/
+COPY backend/app.py ./app.py
 
 EXPOSE 8000
 
-CMD ["uvicorn", "backend.app:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]

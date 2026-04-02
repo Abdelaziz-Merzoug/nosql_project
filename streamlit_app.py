@@ -30,7 +30,7 @@ from streamlit_folium import st_folium
 st.set_page_config(
     layout="wide",
     page_title="IoT Logistics Monitor",
-    page_icon="🚛",
+    page_icon=None,
     initial_sidebar_state="expanded",
 )
 
