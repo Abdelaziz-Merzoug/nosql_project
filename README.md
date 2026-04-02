@@ -100,7 +100,7 @@ nosql_project/
 
 **Option A — Via Git :**
 ```bash
-git clone https://github.com/votre-compte/nosql_project.git
+git clone https://github.com/Abdelaziz-Merzoug/nosql_project.git
 cd nosql_project
 ```
 
